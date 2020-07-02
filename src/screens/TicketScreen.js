@@ -16,6 +16,7 @@ import {mStyles} from '../styles/global';
 const TicketListScreen = ({route, navigation}) => {
   const {colors} = useTheme();
   const [ticket, setTicket] = useState({...route.params, fromServer: false});
+  console.log(route);
   const [progress, setProgress] = useState({
     isLoading: true,
     errorMessage: null,
@@ -24,8 +25,7 @@ const TicketListScreen = ({route, navigation}) => {
   useEffect(() => {
     let cancel;
     let _cancelToken = Axios.CancelToken;
-    let mounted = true; // TODO think about, how we can remove this var
-
+    let mounted = true;
     malertApi
       .get('/tickets.php', {
         params: {id: ticket.id},
@@ -64,8 +64,7 @@ const TicketListScreen = ({route, navigation}) => {
         setTicket({...response.data, fromServer: true});
       })
       .catch(error => {
-        let {message} = parseApiResponse(error.response);
-        Alert.alert('Failed', message, [{text: 'Ok'}]);
+        Alert.alert('Failed', error.message, [{text: 'Ok'}]);
       })
       .finally(() => {
         setIsUpdating(false);

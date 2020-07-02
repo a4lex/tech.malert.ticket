@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Dimensions, Modal, Platform} from 'react-native';
+import {View, Dimensions, Modal} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSafeArea} from 'react-native-safe-area-context';
@@ -19,7 +19,10 @@ export default function QrScannerModal({modalVisible, closeModal, handleData}) {
   };
 
   return (
-    <Modal visible={modalVisible} onRequestClose={closeModal}>
+    <Modal
+      visible={modalVisible}
+      animationType={'slide'}
+      onRequestClose={closeModal}>
       <View>
         <QRCodeScanner
           showMarker
@@ -40,16 +43,16 @@ export default function QrScannerModal({modalVisible, closeModal, handleData}) {
             </View>
           }
         />
-        {Platform.OS === 'ios' ? (
-          <TouchableOpacity onPress={() => closeModal()}>
+        <TouchableOpacity onPress={() => closeModal()}>
+          <View style={{...styles.closeWraper, marginTop: insets.top + 20}}>
             <Icon
-              style={{...styles.closeModal, top: insets.top + 10}}
+              style={{...styles.closeModal}}
               color="#fff"
               name="md-close"
               size={35}
             />
-          </TouchableOpacity>
-        ) : null}
+          </View>
+        </TouchableOpacity>
       </View>
     </Modal>
   );
@@ -64,9 +67,11 @@ const styles = {
     flexDirection: 'row',
   },
   closeModal: {
-    position: 'absolute',
-    left: 25,
     backgroundColor: 'rgba(52, 52, 52, 0)',
+  },
+  closeWraper: {
+    alignSelf: 'flex-start',
+    marginLeft: 20,
   },
   rectangleContainer: {
     flex: 1,

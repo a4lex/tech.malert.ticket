@@ -58,22 +58,17 @@ const TicketListScreen = ({navigation}) => {
   const [listLoading, setListLoading] = useState(false); // bottom progressbar
   const [listRefreshing, setListRefreshing] = useState(false); // top progressbar
 
-  // const [refresh, setRefresh] = useState(0);
+  const [refresh, setRefresh] = useState(0);
   const [dataExists, setDataExists] = useState(true);
-
   const [progress, setProgress] = useState({
     isLoading: true,
     errorMessage: null,
   });
 
   useEffect(() => {
-    // let unsubscribe = navigation.addListener('focus', () => {
-    //  setRefresh(refresh + 1);
-    //   console.log(refresh);
-    // });
-    // return unsubscribe;
-
-    setListLoading(true);
+    if (!listRefreshing) {
+      setListLoading(true);
+    }
 
     malertApi
       .get('/tickets.php', {params: {page: listPage}})
@@ -103,7 +98,7 @@ const TicketListScreen = ({navigation}) => {
       });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listPage]);
+  }, [listPage, refresh]);
 
   if (progress.isLoading) {
     return <FullScreenPreload />;
@@ -133,9 +128,12 @@ const TicketListScreen = ({navigation}) => {
         }
         refreshing={listRefreshing}
         onRefresh={() => {
-          setListRefreshing(true);
-          // setRefresh(refresh + 1);
           setListPage(0);
+          setRefresh(refresh + 1);
+          setListRefreshing(true);
+        }}
+        ListEmptyComponent={() => {
+          return <FullScreenMessage message="Pull screen down to refresh" />;
         }}
       />
     </>
