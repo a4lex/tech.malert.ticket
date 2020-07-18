@@ -1,4 +1,4 @@
-package com.malert;
+package tech.malert.ticket;
 
 import com.facebook.react.ReactActivity;
 

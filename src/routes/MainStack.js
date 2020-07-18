@@ -23,7 +23,7 @@ const MainStack = () => {
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>
-        {state.token ? (
+        {state.long_token ? (
           <Drawer.Navigator
             drawerContent={props => <DrawerContent {...props} />}>
             <Drawer.Screen name="BottomTab" component={BottomTab} />

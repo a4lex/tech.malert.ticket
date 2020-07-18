@@ -1,47 +1,49 @@
 # tech.malert.ticket
 
-##### App build:  
+### App build:
+> git clone https://github.com/a4lex/tech.malert.ticket.git  
+> npm install  
+> cd ios/ && pod install  
 
-git clone https://github.com/a4lex/tech.malert.ticket.git  
-npm install  
-cd ios/ && pod install  
+### Debug
+> npx react-native start  
+> npx react-native run-ios  
+> npx react-native run-android  
+> npx react-native run-ios --configuration Release  
 
-npx react-native start  
-npx react-native run-ios  
-npx react-native run-android  
-npx react-native run-ios --configuration Release  
-
-# Android
-
+### Android
 https://reactnative.dev/docs/signed-apk-android
 
-##### keystore generation:  
+#### keystore generation:  
 
 cd \`/usr/libexec/java\_home\`  
-sudo keytool -genkey -v -keystore malert.tech.keystore -alias malert-tech -keyalg RSA -keysize 2048 -validity 10000
+sudo keytool -genkey -v -keystore malert.tech.keystore -alias malert-tech -keyalg RSA -keysize 2048 -validity 10000  
 > Enter keystore password: malert.tech (hidden)  
 > Re-enter new password:  
 > What is your first and last name?  
->   [Unknown]:  Alexandr  
+>   [Unknown]:  Malert Tech  
 > What is the name of your organizational unit?  
->   [Unknown]:  Home  
+>   [Unknown]:  Product Management  
 > What is the name of your organization?  
->   [Unknown]:  Sweet home  
+>   [Unknown]:  Argos Technology Resources Private Limited  
 > What is the name of your City or Locality?  
->   [Unknown]:  Kitchen  
+>   [Unknown]:  Kolkata  
 > What is the name of your State or Province?  
->   [Unknown]:  Chair  
+>   [Unknown]:  West Bengal  
 > What is the two-letter country code for this unit?  
->   [Unknown]:  CR  
-> Is CN=Alexandr, OU=Home, O=Sweet home, L=Kitchen, ST=Chair, C=CR correct?  
+>   [Unknown]:  IN  
+> Is CN=Malert Tech, OU=Product Management, O=Argos Technology Resources Private Limited, L=Kolkata, ST=West Bengal, C=IN correct?  
 >   [no]:  yes  
 
-##### App release:   
+### App release:   
 
 cd $PROJECT/android
 
-./gradlew bundleRelease -- build AAB (https://android-tools.ru/coding/novyj-sposob-publikacii-prilozhenij-s-pomoshhyu-android-app-bundle/)  
+#### build AAB
+
+> ./gradlew bundleRelease ( https://android-tools.ru/coding/novyj-sposob-publikacii-prilozhenij-s-pomoshhyu-android-app-bundle/)  
 ls -l ../android/app/build/outputs/bundle/release  
-  
-./gradlew assembleRelease -- build APK  
-ls -l ../android/app/build/outputs/apk/release  
+ 
+#### build APK
+> ./gradlew assembleRelease  
+ls -l ../android/app/build/outputs/apk/release

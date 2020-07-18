@@ -1,5 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
+import {validateToken, isExpired} from '../helpers/jwtValidator';
 
 const instance = axios.create({
   baseURL: 'https://malert.tech/api/',
@@ -7,9 +8,11 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   async config => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = token;
+    const short_token = await AsyncStorage.getItem('short_token');
+    if (validateToken(short_token) && !isExpired(short_token)) {
+      config.headers.Authorization = short_token;
+    } else {
+      config.headers.Authorization = await refresh_token();
     }
     return config;
   },
@@ -72,5 +75,22 @@ export function parseApiResponse(_r) {
       result: false,
       message: _r.toString(),
     };
+  }
+}
+
+async function refresh_token() {
+  try {
+    let long_token = await AsyncStorage.getItem('long_token');
+    const response = await axios.get('https://malert.tech/api/refresh.php', {
+      headers: {Authorization: long_token},
+    });
+    let short_token = response.data.short_token;
+    await AsyncStorage.setItem('short_token', short_token);
+    return short_token;
+  } catch (e) {
+    await AsyncStorage.removeItem('long_token');
+    await AsyncStorage.removeItem('short_token');
+    await AsyncStorage.removeItem('info');
+    return null;
   }
 }

@@ -1,9 +1,11 @@
 import createDataContext from './createDataContext';
 import malertApi, {parseApiResponse} from '../api/malert';
 import AsyncStorage from '@react-native-community/async-storage';
+import {validateToken, isExpired} from '../helpers/jwtValidator';
 
 const initState = {
-  token: null,
+  long_token: null,
+  short_token: null,
   info: {
     address: 'Unknown',
     longname: 'Unknown',
@@ -17,7 +19,7 @@ const initState = {
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'SIGNIN':
-      return {...state, token: action.payload};
+      return {...state, ...action.payload};
     case 'SET_USER_INFO':
       return {...state, info: {...state.info, ...action.payload}};
     case 'SIGNOUT':
@@ -31,12 +33,12 @@ const signin = dispatch => async ({mail, password, callback}) => {
   try {
     const response = await malertApi.post('auth.php', {mail, password});
 
-    if (!validateToken(response.data.token)) {
+    if (!validateToken(response.data.long_token)) {
       throw {response: {status: 400, data: {msg: 'Unknown Token Type'}}};
     }
 
-    await AsyncStorage.setItem('token', response.data.token);
-    dispatch({type: 'SIGNIN', payload: response.data.token});
+    await AsyncStorage.setItem('long_token', response.data.long_token);
+    dispatch({type: 'SIGNIN', payload: {long_token: response.data.long_token}});
   } catch (error) {
     callback && callback(parseApiResponse(error.response));
   }
@@ -44,7 +46,8 @@ const signin = dispatch => async ({mail, password, callback}) => {
 
 const signout = dispatch => async () => {
   try {
-    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('long_token');
+    await AsyncStorage.removeItem('short_token');
     await AsyncStorage.removeItem('info');
     dispatch({type: 'SIGNOUT'});
   } catch (error) {
@@ -54,10 +57,22 @@ const signout = dispatch => async () => {
 
 const restoreSession = dispatch => async () => {
   try {
-    const token = await AsyncStorage.getItem('token');
-    if (validateToken(token)) {
-      dispatch({type: 'SIGNIN', payload: token});
-    }
+    const long_token = await AsyncStorage.getItem('long_token');
+    const short_token = await AsyncStorage.getItem('short_token');
+
+    dispatch({
+      type: 'SIGNIN',
+      payload: {
+        long_token:
+          validateToken(long_token) && !isExpired(long_token)
+            ? long_token
+            : null,
+        short_token:
+          validateToken(short_token) && !isExpired(long_token)
+            ? short_token
+            : null,
+      },
+    });
 
     const _info = await AsyncStorage.getItem('info');
     let info = JSON.parse(_info);
@@ -92,9 +107,6 @@ const setUserInfo = dispatch => async (info, callback) => {
 const signup = dispatch => {
   return ({mail, password}) => {};
 };
-
-// TODO validate JWT expire
-const validateToken = token => token && token.startsWith('JWT ');
 
 export const {Provider, Context} = createDataContext(
   authReducer,
